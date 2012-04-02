@@ -1,85 +1,74 @@
 #include "tree.h"
 #include "gtest/gtest.h"
 
-TEST(BinaryTree, BinaryTreeSearchTest) {
-    BinaryTree<int> bintree;
+class BinaryTreeTest : public testing::Test {
+  protected:
+	  virtual void SetUp() {
+		  Node<int> *root = new Node<int>(3);
+		  Node<int> *node = NULL, *parent = NULL;
 
-	Node<int> *root = new Node<int>(3);
-	Node<int> *node = NULL, *parent = NULL;
+		  _bintree.set_root(root);
 
-	bintree.set_root(root);
+		  node = new Node<int>(5);
+		  parent = _bintree.insert_left(root, node);
+		  node = new Node<int>(6);
+		  _bintree.insert_left(parent, node);
+		  node = new Node<int>(15);
+		  _bintree.insert_right(parent, node);
 
-	node = new Node<int>(5);
-	parent = bintree.insert_left(root, node);
-	node = new Node<int>(6);
-	bintree.insert_left(parent, node);
-	node = new Node<int>(15);
-	bintree.insert_right(parent, node);
+		  node = new Node<int>(9);
+		  parent = _bintree.insert_right(root, node);
+		  node = new Node<int>(13);
+		  _bintree.insert_right(parent, node);
+	  }
 
-	node = new Node<int>(9);
-	parent = bintree.insert_right(root, node);
-    node = new Node<int>(13);
-	bintree.insert_right(parent, node);
+	  virtual void TearDown() { }
 
-	node = bintree.search(9);
+	  BinaryTree<int> _bintree;
+};
+
+TEST_F(BinaryTreeTest, BinaryTreeSearchTest) 
+{
+	Node<int> *node = _bintree.search(9);
     EXPECT_EQ(9, node->key);
     
-	node = bintree.search(13);
+	node = _bintree.search(13);
 	EXPECT_EQ(13, node->key);
 
-	node = bintree.search(15);
+	node = _bintree.search(15);
 	EXPECT_EQ(15, node->key);
 
-	node = bintree.search(1);
+	node = _bintree.search(1);
 	EXPECT_EQ(NULL, node);
 }
 
-TEST(BinaryTree, BinaryTreeTraverseTest) 
+TEST_F(BinaryTreeTest, BinaryTreeTraverseTest) 
 {
-    BinaryTree<int> bintree;
-
-	Node<int> *root = new Node<int>(3);
-	Node<int> *node = NULL, *parent = NULL;
-
-	bintree.set_root(root);
-
-	node = new Node<int>(5);
-	parent = bintree.insert_left(root, node);
-	node = new Node<int>(6);
-	bintree.insert_left(parent, node);
-	node = new Node<int>(15);
-	bintree.insert_right(parent, node);
-
-	node = new Node<int>(9);
-	parent = bintree.insert_right(root, node);
-    node = new Node<int>(13);
-	bintree.insert_right(parent, node);
-    
-	int *arr = new int[ bintree.size() ];
+	int *arr = new int[ _bintree.size() ];
 
 	int mid_ord[] = {3, 5, 6, 15, 9, 13};
-    int size = bintree.mid_order(arr);
+    int size = _bintree.mid_order(arr);
 	EXPECT_EQ(size, sizeof(mid_ord)/sizeof(mid_ord[0]));
 	for (int i = 0; i < size; ++i) {
 		EXPECT_EQ(arr[i], mid_ord[i]);
 	}
-    bintree.clear_visit();
+    _bintree.clear_visit();
 
 	int pre_ord[] = {6, 5, 15, 3, 9, 13};
-	size = bintree.pre_order(arr);
+	size = _bintree.pre_order(arr);
 	EXPECT_EQ(size, sizeof(pre_ord)/sizeof(pre_ord[0]));
 	for (int i = 0; i < size; ++i) {
 		EXPECT_EQ(arr[i], pre_ord[i]);
 	}
-    bintree.clear_visit();
+    _bintree.clear_visit();
 
 	int pos_ord[] = {13, 9, 15, 6, 5, 3};
-	size = bintree.pos_order(arr);
+	size = _bintree.pos_order(arr);
 	EXPECT_EQ(size, sizeof(pos_ord)/sizeof(pos_ord[0]));
 	for (int i = 0; i < size; ++i) {
 		EXPECT_EQ(arr[i], pos_ord[i]);
 	}
-    bintree.clear_visit();
+    _bintree.clear_visit();
 }
 
 int main(int argc, char **argv) {

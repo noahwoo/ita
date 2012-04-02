@@ -37,7 +37,10 @@ class BinaryTree
       return _root;
     }
 
-    int size() { return _size; }
+    int size() { 
+		// return _size; 
+		return __size(_root);
+	}
 
     Node<T>* insert_left(Node<T>* parent, Node<T>* node) {
       if (NULL != parent) {
@@ -77,10 +80,19 @@ class BinaryTree
       return _search(v, _root);
     }
 
-	// clear visiting status
-	void clear_visit() {
-		_clear_visit(_root);
-	}
+    // get size of tree
+    int __size(Node<T>* node) {
+		if (NULL != node) {
+			return 1 + __size(node->left) 
+				+ __size(node->right);
+		}
+		return 0;
+    }
+
+    // clear visiting status
+    void clear_visit() {
+        _clear_visit(_root);
+    }
 
     virtual ~BinaryTree() {
       _delete_tree(_root);
@@ -99,11 +111,11 @@ class BinaryTree
 
 template<class T>
 void BinaryTree<T>::_clear_visit(Node<T>* node) {
-	if (NULL != node) {
-		node->visited = false;
-		_clear_visit(node->left);
-		_clear_visit(node->right);
-	}
+    if (NULL != node) {
+        node->visited = false;
+        _clear_visit(node->left);
+        _clear_visit(node->right);
+    }
 }
 
 template<class T>
@@ -191,7 +203,7 @@ int BinaryTree<T>::_pre_order(T* arr, Node<T>* node, int n)
        stack.pop(nd);
        T key = nd->key;
        arr[k++] = key;
-	   nd->visited = true;
+       nd->visited = true;
        if (nd->right != NULL) {
          stack.push(nd->right);
        }
@@ -218,27 +230,27 @@ int BinaryTree<T>::_pos_order(T* arr, Node<T>* node, int n)
    int k = 0;
    Node<T>* nd = NULL;
    while (true) {
-	   if (!stack.peek(nd)) {
-		   break;
-	   }
+       if (!stack.peek(nd)) {
+           break;
+       }
 
-	   bool visit = true;
-	   if (nd->right != NULL && !nd->right->visited) {
-		   stack.push(nd->right);
-		   visit = false;
-	   }
+       bool visit = true;
+       if (nd->right != NULL && !nd->right->visited) {
+           stack.push(nd->right);
+           visit = false;
+       }
 
-	   if (nd->left != NULL && !nd->left->visited) {
-		   stack.push(nd->left);
-		   visit = false;
-	   }
+       if (nd->left != NULL && !nd->left->visited) {
+           stack.push(nd->left);
+           visit = false;
+       }
 
-	   if (visit) {
-		   stack.pop(nd);
-		   T key = nd->key;
-		   arr[k++] = key;
-		   nd->visited = true;
-	   }
+       if (visit) {
+           stack.pop(nd);
+           T key = nd->key;
+           arr[k++] = key;
+           nd->visited = true;
+       }
    }
    return k;
 #endif
