@@ -132,7 +132,7 @@ void SortAlgo<T>::msort(T* arr, int bgn, int end) {
 	for (int p = 0; p < k; ++p) {
 		arr[bgn+p] = buff[p];
 	}
-    delete buff;
+  delete buff;
 }
 
 #endif // ALGO_BASIC_SORT_H_
