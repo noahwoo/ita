@@ -27,11 +27,18 @@ class BinaryTreeTest : public testing::Test {
 	  BinaryTree<int> _bintree;
 };
 
+class BinarySearchTreeTest : public testing::Test {
+  protected:
+	  virtual void SetUp() { }
+	  virtual void TearDown() { }
+	  BinarySearchTree<int> _bstree;
+};
+
 TEST_F(BinaryTreeTest, BinaryTreeSearchTest) 
 {
 	Node<int> *node = _bintree.search(9);
-    EXPECT_EQ(9, node->key);
-    
+	EXPECT_EQ(9, node->key);
+
 	node = _bintree.search(13);
 	EXPECT_EQ(13, node->key);
 
@@ -46,13 +53,13 @@ TEST_F(BinaryTreeTest, BinaryTreeTraverseTest)
 {
 	int *arr = new int[ _bintree.size() ];
 
-	int mid_ord[] = {3, 5, 6, 15, 9, 13};
-    int size = _bintree.mid_order(arr);
-	EXPECT_EQ(size, sizeof(mid_ord)/sizeof(mid_ord[0]));
+	int in_ord[] = {3, 5, 6, 15, 9, 13};
+	int size = _bintree.in_order(arr);
+	EXPECT_EQ(size, sizeof(in_ord)/sizeof(in_ord[0]));
 	for (int i = 0; i < size; ++i) {
-		EXPECT_EQ(arr[i], mid_ord[i]);
+		EXPECT_EQ(arr[i], in_ord[i]);
 	}
-    _bintree.clear_visit();
+	_bintree.clear_visit();
 
 	int pre_ord[] = {6, 5, 15, 3, 9, 13};
 	size = _bintree.pre_order(arr);
@@ -60,18 +67,96 @@ TEST_F(BinaryTreeTest, BinaryTreeTraverseTest)
 	for (int i = 0; i < size; ++i) {
 		EXPECT_EQ(arr[i], pre_ord[i]);
 	}
-    _bintree.clear_visit();
+	_bintree.clear_visit();
 
-	int pos_ord[] = {13, 9, 15, 6, 5, 3};
-	size = _bintree.pos_order(arr);
-	EXPECT_EQ(size, sizeof(pos_ord)/sizeof(pos_ord[0]));
-	for (int i = 0; i < size; ++i) {
-		EXPECT_EQ(arr[i], pos_ord[i]);
+    int pos_ord[] = {13, 9, 15, 6, 5, 3};
+    size = _bintree.pos_order(arr);
+    EXPECT_EQ(size, sizeof(pos_ord)/sizeof(pos_ord[0]));
+    for (int i = 0; i < size; ++i) {
+        EXPECT_EQ(arr[i], pos_ord[i]);
+    }
+	_bintree.clear_visit();
+}
+
+TEST_F(BinarySearchTreeTest, BinarySearchTreeInsertTest) 
+{
+	int keys[] = {3, 15, 6, 6, 15, 9, 13};
+	for (int i = 0; i < sizeof(keys)/sizeof(keys[0]); ++i) {
+		Node<int>* node = new Node<int>();
+		node->key = keys[i];
+		_bstree.insert(node);
 	}
-    _bintree.clear_visit();
+	EXPECT_EQ(_bstree.size(), sizeof(keys)/sizeof(keys[0]));
+    Node<int>* node = _bstree.search(6);
+    ASSERT_TRUE(NULL != node);
+	EXPECT_EQ(node->key, 6);
+	ASSERT_TRUE(NULL == _bstree.search(10));
+}
+
+TEST_F(BinarySearchTreeTest, BinarySearchTreeMinMaxTest) 
+{
+	int keys[] = {3, 15, 6, 6, 15, 9, 13, 1, 2}; 
+	for (int i = 0; i < sizeof(keys)/sizeof(keys[0]); ++i) {
+		Node<int>* node = new Node<int>(keys[i]);
+		_bstree.insert(node);
+	}
+	EXPECT_EQ(_bstree.size(), sizeof(keys)/sizeof(keys[0]));
+	EXPECT_EQ(_bstree.minimum()->key, 1);
+	EXPECT_EQ(_bstree.maximum()->key, 15);
+}
+
+TEST_F(BinarySearchTreeTest, BinarySearchTreeSuccPredTest) 
+{
+	int keys[] = {3, 15, 6, 6, 17, 9, 13, 1, 2}; 
+	for (int i = 0; i < sizeof(keys)/sizeof(keys[0]); ++i) {
+		Node<int>* node = new Node<int>(keys[i]);
+		_bstree.insert(node);
+	}
+	EXPECT_EQ(_bstree.size(), sizeof(keys)/sizeof(keys[0]));
+	Node<int>* node = _bstree.search(13);
+	EXPECT_EQ(node->key, 13);
+
+	const Node<int>* succ1 = _bstree.successor(node);
+	ASSERT_TRUE(succ1 != NULL);
+	EXPECT_EQ(succ1->key, 15);
+
+	node = _bstree.search(17);
+	EXPECT_EQ(node->key, 17);
+
+	const Node<int>* succ2 = _bstree.successor(node);
+	ASSERT_TRUE(succ2 == NULL);
+
+	node = _bstree.search(6);
+	EXPECT_EQ(node->key, 6);
+
+	const Node<int>* pred1 = _bstree.predecessor(node);
+	ASSERT_TRUE(pred1 != NULL);
+	EXPECT_EQ(pred1->key, 3);
+
+	node = _bstree.search(1);
+	EXPECT_EQ(node->key, 1);
+
+	const Node<int>* pred2 = _bstree.predecessor(node);
+	ASSERT_TRUE(pred2 == NULL);
+}
+
+TEST_F(BinarySearchTreeTest, BinarySearchTreeDeleteTest) 
+{
+	int keys[] = {3, 15, 6, 6, 17, 9, 13, 1, 2}; 
+	for (int i = 0; i < sizeof(keys)/sizeof(keys[0]); ++i) {
+		Node<int>* node = new Node<int>(keys[i]);
+		_bstree.insert(node);
+	}
+	EXPECT_EQ(_bstree.size(), sizeof(keys)/sizeof(keys[0]));
+	Node<int>* node = _bstree.search(13);
+	EXPECT_EQ(node->key, 13);
+
+	_bstree.delete_n(node);
+    node = _bstree.search(13);
+	ASSERT_TRUE(NULL == node);
 }
 
 int main(int argc, char **argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
