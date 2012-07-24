@@ -9,24 +9,50 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
 #include <algorithm>
 
 #include "stack.h"
+#include "utils.h"
 
 #define RECUR 1
 
 template<class T>
 struct Node {
     T key;
-    bool visited;
     Node* left;
     Node* right;
     Node* parent;
-    Node() : left(NULL), right(NULL), parent(NULL), visited(false) {}
-    Node(T k) : left(NULL), right(NULL), parent(NULL), visited(false) {
+    bool visited;
+    bool black;
+
+    static Node<T>* NIL;
+
+    Node() : left(NULL), right(NULL), parent(NULL), 
+             visited(false), black(false) {}
+    Node(T k) : left(NULL), right(NULL), parent(NULL), 
+             visited(false), black(false) {
         key = k;
     }
+    std::string to_string() {
+        std::ostringstream oss;
+        oss << "[" << key << "," << visited 
+            << "," << black << "]";
+        return oss.str();
+    }
+
+    static Node<T>* nil() {
+        if (NIL != NULL) {
+            return NIL;
+        }
+        NIL = new Node<T>;
+        NIL->black = true;
+        return NIL;
+    }
 };
+
+template<class T>
+Node<T>* Node<T>::NIL = NULL;
 
 template<class T>
 class BinaryTree 
@@ -96,9 +122,21 @@ class BinaryTree
           _clear_visit(_root);
       }
 
-      virtual ~BinaryTree() {
-          _delete_tree(_root);
+      std::string to_string() {
+          if (NULL == _root) {
+              return "";
+          }
+          std::vector<std::string> paths;
+          _to_string(_root, paths);
+          std::ostringstream oss;
+          std::vector<std::string>::const_iterator cit;
+          for (cit = paths.begin(); cit != paths.end(); ++cit) {
+              oss << *cit << "\n";
+          }
+          return oss.str();
       }
+
+      virtual ~BinaryTree();
   public:
       Node<T>* _root;
       int _size;
@@ -109,11 +147,49 @@ class BinaryTree
       int _in_order(T* arr, Node<T>* node, int n);
       int _pos_order(T* arr, Node<T>* node, int n);
       void _clear_visit(Node<T>* node);
+      void _to_string(Node<T>* node, std::vector<std::string>& paths);
 };
 
 template<class T>
+BinaryTree<T>::~BinaryTree()
+{
+    _delete_tree(_root);
+}
+
+template<class T>
+void BinaryTree<T>::_to_string(Node<T>* node, 
+            std::vector<std::string>& paths)
+{
+    std::vector<std::string> lpaths;
+    std::vector<std::string> rpaths;
+    std::string node_str = node->to_string();
+    if (node->right != NULL) {
+        _to_string(node->right, lpaths);
+        std::string head0 = node_str + "/-";
+        std::string head1 = utils::padding(head0.length(), ' ');
+        paths.push_back(head0 + lpaths[0]);
+        for (int i = 1; i < lpaths.size(); ++i) {
+            paths.push_back(head1 + lpaths[i]);
+        }
+    }
+    int nlpaths = paths.size();
+    if (node->left != NULL) {
+        _to_string(node->left, rpaths);
+        std::string head0 = utils::padding(node_str.length(), ' ') + "\\_";
+        std::string head1 = utils::padding(head0.length(), ' ');
+        paths.push_back(head0 + rpaths[0]);
+        for (int i = 1; i < rpaths.size(); ++i) {
+            paths.push_back(head1 + rpaths[i]);
+        }
+    }else {
+        paths.push_back(node->to_string());
+    }
+
+}
+
+template<class T>
 void BinaryTree<T>::_clear_visit(Node<T>* node) {
-    if (NULL != node) {
+    if (NULL != node && Node<T>::nil() != node) {
         node->visited = false;
         _clear_visit(node->left);
         _clear_visit(node->right);
@@ -122,7 +198,7 @@ void BinaryTree<T>::_clear_visit(Node<T>* node) {
 
 template<class T>
 void BinaryTree<T>::_delete_tree(Node<T>* node) {
-    if (NULL != node) {
+    if (NULL != node && Node<T>::nil() != node) {
         _delete_tree(node->left);
         _delete_tree(node->right);
         delete node;

@@ -20,6 +20,8 @@ class BinaryTreeTest : public testing::Test {
           parent = _bintree.insert_right(root, node);
           node = new Node<int>(13);
           _bintree.insert_right(parent, node);
+
+		  std::cout << _bintree.to_string();
       }
 
       virtual void TearDown() { }
