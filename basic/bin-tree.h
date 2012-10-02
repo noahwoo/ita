@@ -121,7 +121,7 @@ class BinaryTree
       void clear_visit() {
           _clear_visit(_root);
       }
-
+      virtual Node<T>* delete_n(Node<T>* node);
       std::string to_string() {
           if (NULL == _root) {
               return "";
@@ -154,6 +154,12 @@ template<class T>
 BinaryTree<T>::~BinaryTree()
 {
     _delete_tree(_root);
+}
+
+template<class T>
+Node<T>* BinaryTree<T>::delete_n(Node<T>* node) 
+{
+    return NULL;
 }
 
 template<class T>

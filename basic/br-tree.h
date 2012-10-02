@@ -12,21 +12,121 @@
 #include <algorithm>
 
 #include "bin-tree.h"
+#include "bin-tree-search.h"
 // binary search tree
 template<class T>
-class BlackRedTree : public BinaryTree<T>
+class BlackRedTree : public BinarySearchTree<T>
 {
     public:
         BlackRedTree() {
-			BinaryTree<T>::_root = Node<T>::nil();
-		}
+            BinaryTree<T>::_root = Node<T>::nil();
+        }
         void insert(Node<T>* node);
-		~BlackRedTree() {}
+        Node<T>* delete_n(Node<T>* node);
+        ~BlackRedTree() {}
     private:
         void left_rotate(Node<T>* node);
         void right_rotate(Node<T>* node);
         void insert_fixup(Node<T>* node);
+        void delete_fixup(Node<T>* node);
 };
+
+template<class T>
+void BlackRedTree<T>::delete_fixup(Node<T>* node)
+{
+    while (node != BinaryTree<T>::_root 
+           && node->black == true) {
+        if (node == node->parent->left) {
+            Node<T>* wnode = node->parent->right;
+            if (wnode->black == false) {
+                wnode->black = true;
+                node->parent->black = false;
+                left_rotate(node->parent);
+            }
+            if (wnode->left->black == true &&
+                wnode->right->black == true) {
+                wnode->black = false;
+                node = node->parent;
+            } else { 
+                if (wnode->right->black == true) {
+                    wnode->left->black = true;
+                    wnode->black = false;
+                    right_rotate(wnode);
+                    wnode = node->parent->right;
+                }
+                wnode->black = node->parent->black;
+                node->parent->black = true;
+                wnode->right->black = true;
+                left_rotate(node->parent);
+                node = BinaryTree<T>::_root;
+            }
+        } else {
+            Node<T>* wnode = node->parent->left;
+            if (wnode->black == false) {
+                wnode->black = true;
+                node->parent->black = false;
+                right_rotate(node->parent);
+            }
+            if (wnode->right->black == true &&
+                wnode->left->black == true) {
+                wnode->black = false;
+                node = node->parent;
+            } else { 
+                if (wnode->left->black == true) {
+                    wnode->right->black = true;
+                    wnode->black = false;
+                    left_rotate(wnode);
+                    wnode = node->parent->left;
+                }
+                wnode->black = node->parent->black;
+                node->parent->black = true;
+                wnode->left->black = true;
+                right_rotate(node->parent);
+                node = BinaryTree<T>::_root;
+            }
+        }
+    }
+    node->black = true;
+}
+
+template<class T>
+Node<T>* BlackRedTree<T>::delete_n(Node<T>* node)
+{
+    Node<T>* ynode = Node<T>::nil();
+    if (node->left == Node<T>::nil() || 
+        node->right == Node<T>::nil()) {
+        ynode = node;
+    } else {
+        ynode = successor(node);
+    }
+
+    Node<T>* xnode = Node<T>::nil();
+    if (ynode->left != Node<T>::nil()) {
+        xnode = ynode->left;
+    } else {
+        xnode = ynode->right;
+    }
+    xnode->parent = ynode->parent;
+    if (ynode->parent == Node<T>::nil()) {
+        BinaryTree<T>::_root = xnode;
+    } else {
+        if (ynode == ynode->parent->left) {
+            ynode->parent->left = xnode;
+        } else {
+            ynode->parent->right = xnode;
+        }
+    }
+
+    if (ynode != node) {
+        node->key = ynode->key;
+    }
+
+    if (ynode->black == true) {
+        delete_fixup(xnode);
+    }
+
+    return ynode;
+}
 
 template<class T>
 void BlackRedTree<T>::insert(Node<T>* node)

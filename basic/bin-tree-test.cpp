@@ -73,7 +73,8 @@ TEST_F(BinaryTreeTest, BinaryTreeTraverseTest)
     _bintree.clear_visit();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -10,19 +10,21 @@ class BlackRedTreeTest : public testing::Test {
 TEST_F(BlackRedTreeTest, BlackRedTreeInsertTest)
 {
     BlackRedTree<int> _brtree;
-    Node<int>* pnode = new Node<int>(3);
+    Node<int>* pnode = new Node<int>(41);
     _brtree.insert(pnode);
-    pnode = new Node<int>(5);
+    pnode = new Node<int>(38);
     _brtree.insert(pnode);
-    pnode = new Node<int>(2);
+    pnode = new Node<int>(31);
     _brtree.insert(pnode);
-    pnode = new Node<int>(6);
+    pnode = new Node<int>(12);
     _brtree.insert(pnode);
-    pnode = new Node<int>(7);
-    _brtree.insert(pnode);
-    pnode = new Node<int>(9);
+    pnode = new Node<int>(19);
     _brtree.insert(pnode);
     pnode = new Node<int>(8);
+    _brtree.insert(pnode);
+    std::cout << _brtree.to_string();
+
+    pnode = new Node<int>(7);
     _brtree.insert(pnode);
     pnode = new Node<int>(1);
     _brtree.insert(pnode);
@@ -39,6 +41,13 @@ TEST_F(BlackRedTreeTest, BlackRedTreeInsertTest)
     EXPECT_EQ(17, node->key);
 
 	node = _brtree.search(24);
+	EXPECT_EQ(NULL, node);
+
+	node = _brtree.search(17);
+	node = _brtree.delete_n(node);
+	EXPECT_TRUE(NULL != node && 17 == node->key);
+
+	node = _brtree.search(17);
 	EXPECT_EQ(NULL, node);
 }
 

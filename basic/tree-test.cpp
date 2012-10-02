@@ -78,6 +78,22 @@ TEST_F(BinaryTreeTest, BinaryTreeTraverseTest)
 	_bintree.clear_visit();
 }
 
+TEST_F(BinaryTreeTest, BinaryTreeBfsDfsTest)
+{
+    int buff[6];
+    int bfs_ord[] = {3, 5, 9, 6, 15, 13};
+    int n = _bintree.bfs_order(buff);
+    for (int i = 0; i < n; ++i) {
+        EXPECT_EQ(buff[i], bfs_ord[i]);
+    }
+    
+    int dfs_ord[] = {3, 5, 6, 15, 9, 13};
+    n = _bintree.dfs_order(buff);
+    for (int i = 0; i < n; ++i) {
+        EXPECT_EQ(buff[i], dfs_ord[i]);
+    }
+}
+
 TEST_F(BinarySearchTreeTest, BinarySearchTreeInsertTest) 
 {
 	int keys[] = {3, 15, 6, 6, 15, 9, 13};

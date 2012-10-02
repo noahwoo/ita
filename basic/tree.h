@@ -10,6 +10,8 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <queue>
+#include <stack>
 
 #include "stack.h"
 
@@ -31,84 +33,90 @@ struct Node {
 template<class T>
 class BinaryTree 
 {
-  public:
-      BinaryTree() : _root(NULL), _size(0) { }
-      const Node<T>* get_root() { return _root; }
-      Node<T>* set_root(Node<T>* node) {
-          _root = node;
-          return _root;
-      }
+    public:
+        BinaryTree() : _root(NULL), _size(0) { }
+        const Node<T>* get_root() { return _root; }
+        Node<T>* set_root(Node<T>* node) {
+            _root = node;
+            return _root;
+        }
 
-      int size() { 
-          // return _size; 
-          return __size(_root);
-      }
+        int size() { 
+            // return _size; 
+            return __size(_root);
+        }
 
-      Node<T>* insert_left(Node<T>* parent, Node<T>* node) {
-          if (NULL != parent) {
-              parent->left = node;
-              _size += 1;
-              return node;
-          }
-          return NULL;
-      }
+        Node<T>* insert_left(Node<T>* parent, Node<T>* node) {
+            if (NULL != parent) {
+                parent->left = node;
+                _size += 1;
+                return node;
+            }
+            return NULL;
+        }
 
-      Node<T>* insert_right(Node<T>* parent, Node<T>* node) {
-          if (NULL != parent) {
-              parent->right = node;
-              _size += 1;
-              return node;
-          }
-          return NULL;
-      }
+        Node<T>* insert_right(Node<T>* parent, Node<T>* node) {
+            if (NULL != parent) {
+                parent->right = node;
+                _size += 1;
+                return node;
+            }
+            return NULL;
+        }
 
-      // pre order traverse
-      int pre_order(T* arr) {
-          return _pre_order(arr, _root, 0);
-      }
+        // pre order traverse
+        int pre_order(T* arr) {
+            return _pre_order(arr, _root, 0);
+        }
 
-      // in order traverse
-      int in_order(T* arr) {
-          return _in_order(arr, _root, 0);
-      }
+        // in order traverse
+        int in_order(T* arr) {
+            return _in_order(arr, _root, 0);
+        }
+        
+        // bfs traverse
+        int bfs_order(T* arr);
+        
+        // dfs traverse
+        int dfs_order(T* arr);
 
-      // pos order traverse
-      int pos_order(T* arr) {
-          return _pos_order(arr, _root, 0);
-      }
+        // pos order traverse
+        int pos_order(T* arr) {
+            return _pos_order(arr, _root, 0);
+        }
 
-      // search for given key
-      virtual Node<T>* search(const T& v) {
-          return _search(v, _root);
-      }
+        // search for given key
+        virtual Node<T>* search(const T& v) {
+            return _search(v, _root);
+        }
 
-      // get size of tree
-      int __size(Node<T>* node) {
-          if (NULL != node) {
-              return 1 + __size(node->left) 
-                  + __size(node->right);
-          }
-          return 0;
-      }
+        // get size of tree
+        int __size(Node<T>* node) {
+            if (NULL != node) {
+                return 1 + __size(node->left) 
+                    + __size(node->right);
+            }
+            return 0;
+        }
 
-      // clear visiting status
-      void clear_visit() {
-          _clear_visit(_root);
-      }
+        // clear visiting status
+        void clear_visit() {
+            _clear_visit(_root);
+        }
 
-      virtual ~BinaryTree() {
-          _delete_tree(_root);
-      }
-  public:
-      Node<T>* _root;
-      int _size;
-  private:
-      Node<T>* _search(const T& v, Node<T>* node);
-      void _delete_tree(Node<T>* node);
-      int _pre_order(T* arr, Node<T>* node, int n);
-      int _in_order(T* arr, Node<T>* node, int n);
-      int _pos_order(T* arr, Node<T>* node, int n);
-      void _clear_visit(Node<T>* node);
+        virtual ~BinaryTree() {
+            _delete_tree(_root);
+        }
+    public:
+        Node<T>* _root;
+        int _size;
+    private:
+        Node<T>* _search(const T& v, Node<T>* node);
+        void _delete_tree(Node<T>* node);
+        int _pre_order(T* arr, Node<T>* node, int n);
+        int _in_order(T* arr, Node<T>* node, int n);
+        int _pos_order(T* arr, Node<T>* node, int n);
+        void _clear_visit(Node<T>* node);
 };
 
 template<class T>
@@ -258,6 +266,50 @@ int BinaryTree<T>::_pos_order(T* arr, Node<T>* node, int n)
 #endif
 }
 
+template<class T>
+int BinaryTree<T>::bfs_order(T* arr)
+{
+    std::queue<Node<T>*> children_queue;
+    children_queue.push(_root);
+    int n = 0;
+    while (!children_queue.empty()) {
+        Node<T>* p = children_queue.front();
+        children_queue.pop();
+        arr[n] = p->key;
+        n += 1;
+        if (p->left) {
+            children_queue.push(p->left);
+        }
+        if (p->right) {
+            children_queue.push(p->right);
+        }
+    }
+    return n;
+}
+
+template<class T>
+int BinaryTree<T>::dfs_order(T *arr)
+{
+    std::stack<Node<T>*> children_stack;
+    children_stack.push(_root);
+    int n = 0;
+    while (!children_stack.empty()) {
+        Node<T>* p = children_stack.top();
+        children_stack.pop();
+        arr[n] = p->key;
+        n += 1;
+        
+        if (p->right) {
+            children_stack.push(p->right);
+        }
+        
+        if (p->left) {
+            children_stack.push(p->left);
+        }
+    }
+    return n;
+}
+
 // binary search tree
 template<class T>
 class BinarySearchTree : public BinaryTree<T>
@@ -279,38 +331,38 @@ class BinarySearchTree : public BinaryTree<T>
 template<class T>
 Node<T>* BinarySearchTree<T>::delete_n(Node<T>* node)
 {
-	Node<T>* yn = NULL;
-	Node<T>* xn = NULL;
+    Node<T>* yn = NULL;
+    Node<T>* xn = NULL;
     if (node->left == NULL or node->right == NULL) {
         yn = node;
-	} else {
-		yn = successor(node);
-	}
+    } else {
+        yn = successor(node);
+    }
 
-	if (yn->left != NULL) {
-		xn = yn->left;
-	} else {
-		xn = yn->right;
-	}
+    if (yn->left != NULL) {
+        xn = yn->left;
+    } else {
+        xn = yn->right;
+    }
 
-	if (xn != NULL) {
-		xn->parent = yn->parent;
-	}
+    if (xn != NULL) {
+        xn->parent = yn->parent;
+    }
 
-	if (yn->parent == NULL) {
-		BinaryTree<T>::_root  = xn;
-	} else {
-		if (yn == yn->parent->left) {
-			yn->parent->left  = xn;
-		} else {
-			yn->parent->right = xn;
-		}
-	}
+    if (yn->parent == NULL) {
+        BinaryTree<T>::_root  = xn;
+    } else {
+        if (yn == yn->parent->left) {
+            yn->parent->left  = xn;
+        } else {
+            yn->parent->right = xn;
+        }
+    }
 
-	if (yn != node) {
-		node->key = yn->key;
-	}
-	return yn;
+    if (yn != node) {
+        node->key = yn->key;
+    }
+    return yn;
 }
 
 template<class T>
